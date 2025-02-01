@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - View Registered Teams</title>
+</head>
+<body>
+    <h1>Registered Teams</h1>
+    <button onclick="fetchTeams()">Refresh Data</button>
+    <button onclick="logout()">Logout</button>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Leader Name</th>
+                <th>Leader Email</th>
+                <th>Leader Phone</th>
+                <th>Team Members</th>
+            </tr>
+        </thead>
+        <tbody id="team-list">
+            <!-- Teams will be populated here -->
+        </tbody>
+    </table>
+    <button onclick="exportCSV()">Export as CSV</button>
+    <script>
+        async function fetchTeams() {
+            try {
+                const response = await fetch('/all-teams', {
+                    method: 'GET',
+                    credentials: 'include' // Ensures session cookie is sent
+                });
+
+                if (response.status === 401) {
+                    alert('Unauthorized. Redirecting to login.');
+                    window.location.href = "login.html";
+                    return;
+                }
+
+                const teams = await response.json();
+                const tableBody = document.getElementById('team-list');
+                tableBody.innerHTML = "";
+
+                teams.forEach((team, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${team.leader.name}</td>
+                        <td>${team.leader.email}</td>
+                        <td>${team.leader.phone}</td>
+                        <td>${team.members.map(member => `${member.name} (${member.email})`).join('<br>')}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error fetching teams:", error);
+                alert("Failed to fetch registered teams.");
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch('/logout', { method: 'POST', credentials: 'include' });
+                alert("Logged out successfully.");
+                window.location.href = "login.html";
+            } catch (error) {
+                console.error("Logout failed:", error);
+                alert("Logout failed.");
+            }
+        }
+
+        window.onload = fetchTeams;
+
+
+
+        function exportCSV() {
+        fetch('/export-csv', {
+            method: 'GET',
+            credentials: 'include' // Ensures session authentication
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'teams.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        })
+        .catch(error => {
+            console.error("Export CSV failed:", error);
+            alert("Failed to export CSV");
+        });
+    }
+    </script>
+</body>
+</html>

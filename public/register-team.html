@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Registration</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Register Your Team</h1>
+        <form id="teamForm">
+            <h2>Team Leader</h2>
+            <label>Name: <input type="text" id="leader-name" required></label><br>
+            <label>Email: <input type="email" id="leader-email" required></label><br>
+            <label>Phone: <input type="tel" id="leader-phone" required></label><br>
+
+            <h2>Team Members</h2>
+            <div id="members">
+                <div class="member">
+                    <hr>
+                    <label>Name: <input type="text" class="member-name"></label><br>
+                    <label>Email: <input type="email" class="member-email"></label><br>
+                    <label>Phone: <input type="tel" class="member-phone"></label><br>
+                    <hr>
+                </div>
+            </div>
+            <button type="button" id="addMember">Add Member</button><br>
+            <button type="submit">Register Team</button>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+<script>
+    document.getElementById('addMember').addEventListener('click', () => {
+    const membersDiv = document.getElementById('members');
+    const memberCount = membersDiv.children.length + 1;
+
+    if (memberCount <= 5) {
+        const memberDiv = document.createElement('div');
+        memberDiv.classList.add('member');
+        memberDiv.innerHTML = `
+            
+            <label>Name: <input type="text" class="member-name"></label><br>
+            <label>Email: <input type="email" class="member-email"></label><br>
+            <label>Phone: <input type="tel" class="member-phone"></label><br>
+            <hr>
+        `;
+        membersDiv.appendChild(memberDiv);
+    } else {
+        alert("Maximum 5 members allowed!");
+    }
+});
+
+
+</script>
